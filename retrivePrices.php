@@ -1,11 +1,29 @@
 <?php
-	$ch = curl_init();
+	$currencies = array('bitcoin', 'ethereum', 'omisego');
+	$currenciesCount = count($currencies);
+	$curl_arr = array();
+	$ch = curl_multi_init();
+	$mainURL = "https://api.coinmarketcap.com/v1/ticker/";
 	//setting up curl request
-	curl_setopt($ch, CURLOPT_URL, "https://api.coinmarketcap.com/v1/ticker/bitcoin/");
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($ch, CURLOPT_FOLLOWLOCATION,true);
+
+	for($i=0; $i<$currenciesCount;$i++){
+		$url = $mainURL . $currencies[$i] . '/';
+		$curl_arr[$i] = curl_init($url);
+		curl_setopt($curl_arr[$i], CURLOPT_RETURNTRANSFER, true);
+		curl_multi_add_handle($ch, $curl_arr[$i]);		
+	}
+
+	do{
+		curl_multi_exec($ch,$running);
+	} while($running>0);
+
+	for($i=0; $i<$currenciesCount;$i++){
+		$results = json_decode(curl_multi_getcontent($curl_arr[$i]),false);
+	}
+	print_r($results);
 
 	//get response of request
+	/*
 	$data = curl_exec($ch);
 
 	$errors = curl_error($ch);
@@ -17,9 +35,16 @@
 	var_dump($response);
 	$values = json_decode($data, true);
 	print_r($values);
+
+	foreach($values as $coin){
+		//check if name is equal to item requested in a list
+		echo $coin['name'] . " price: " . $coin['price_usd'] . " |||| Change in 24hr: " . $coin['percent_change_24h'] . "%\n";
+	}*//*
 	echo "Bitcoin price: " . $values[0]['price_usd'] . "\n";
 	echo "Change in 24hr: " . $values[0]['percent_change_24h'] . "\n";
+*/
 
+	/* Messaging GroupMe Part
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL, "https://api.groupme.com/v3/bots/post");
 	curl_setopt($ch, CURLOPT_POST,1);
@@ -35,6 +60,11 @@
 	}
 	else{
 		echo 'Error';
-	}
+	}*/
 
+
+/*
+option 1: write request for each specified currency
+option 2: request for n currencies, iterate and find match
+*/
 ?>
