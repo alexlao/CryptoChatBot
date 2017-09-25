@@ -1,10 +1,10 @@
 <?php
 	//Variables to detect major changes
-	$rally = 'MAJOR RALLIES';
+	$rally = "MAJOR RALLIES\n";
 	$rallyIndicator = false;
-	$fall = 'MAJOR FALLS';
+	$fall = "MAJOR FALLS\n";
 	$fallIndicator = false;
-	
+	$message = null;
 	$currencyFile = fopen("currencies.txt","r") or die("Unable to open file");
 	$fileText = fread($currencyFile,filesize("currencies.txt"));
 	$currencies = explode(",",$fileText);
@@ -33,64 +33,44 @@
 
 	//Prints current prices for all specified currencies. Also checks for major changes in past hour.
 	foreach($results as $coin){
-		echo $coin[0]['name'] . "'s current price is " . $coin[0]['price_usd'] . ' its %change in 24hr is ' . $coin[0]['percent_change_24h'] . "\n";
+		$message = $message . $coin[0]['name'] . "'s current price is " . $coin[0]['price_usd'] . '. Its %change in 24hr is ' . $coin[0]['percent_change_24h'] . "\n\n";
 		if(doubleval($coin[0]['percent_change_1h'])>7.5){
-			$rally = $rally . "\n" . $coin[0]['name'] . " is shooting up. It has gained " . $coin[0]['percent_change_1h'] . " in the past hour";
+			$rally = $rally . $coin[0]['name'] . " is shooting up. It has gained " . $coin[0]['percent_change_1h'] . " in the past hour.\n";
 			$rallyIndicator = true;
 		}
 		else if(doubleval($coin[0]['percent_change_1h'])<-7.5){
-			$fall = $fall . "\n" . $coin[0]['name'] . " is collapsing. It has dropped " . $coin[0]['percent_change_1h'] . " in the past hour";
+			$fall = $fall . $coin[0]['name'] . " is collapsing. It has dropped " . $coin[0]['percent_change_1h'] . " in the past hour.\n";
 			$fallIndicator = true;
 		}
 	}
 	if($rallyIndicator){
+		$message = $message . $rally;
 		echo $rally . "\n";
 	}
 	if($fallIndicator){
+		$message = $message . "\n" . $fall;
 		echo $fall . "\n";
 	}
-
+	curl_multi_close($ch);
 	fclose($currencyFile);
-	//get response of request
-	/*
-	$data = curl_exec($ch);
 
-	$errors = curl_error($ch);
-	$response = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+	//Messaging GroupMe Part
+	$chat = curl_init();
+	curl_setopt($chat, CURLOPT_URL, "https://api.groupme.com/v3/bots/post");
+	curl_setopt($chat, CURLOPT_POST,1);
+	curl_setopt($chat, CURLOPT_POSTFIELDS,http_build_query(array('bot_id'=>'68049da0849ea1551753f26e25','text'=>$message)));
+	curl_setopt($chat, CURLOPT_RETURNTRANSFER, true);
 
-	//close curl request
-	curl_close($ch);
-	//var_dump($errors);
-	var_dump($response);
-	$values = json_decode($data, true);
-	print_r($values);
+	//$server_reply = curl_exec($chat);
+	
 
-	foreach($values as $coin){
-		//check if name is equal to item requested in a list
-		echo $coin['name'] . " price: " . $coin['price_usd'] . " |||| Change in 24hr: " . $coin['percent_change_24h'] . "%\n";
-	}*//*
-	echo "Bitcoin price: " . $values[0]['price_usd'] . "\n";
-	echo "Change in 24hr: " . $values[0]['percent_change_24h'] . "\n";
-*/
-
-	/* Messaging GroupMe Part
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_URL, "https://api.groupme.com/v3/bots/post");
-	curl_setopt($ch, CURLOPT_POST,1);
-	curl_setopt($ch, CURLOPT_POSTFIELDS,http_build_query(array('bot_id'=>'52f7968f3fa35936ef8c8be25d','text'=>'Bitcoin price: ' . $values[0]['price_usd'])));
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-	$server_reply = curl_exec($ch);
-
-	curl_close($ch);
-
-	if($server_reply=="OK"){
-		echo 'Good response';
+	if(curl_exec($chat)===false){
+		echo 'Curl error: ' . curl_error($ch);
 	}
 	else{
-		echo 'Error';
-	}*/
-
+		echo 'Good response';
+	}
+	curl_close($chat);
 
 /*
 option 1: write request for each specified currency
