@@ -18,10 +18,31 @@
 	} while($running>0);
 
 	for($i=0; $i<$currenciesCount;$i++){
-		$results = json_decode(curl_multi_getcontent($curl_arr[$i]),false);
+		$results[] = json_decode(curl_multi_getcontent($curl_arr[$i]),true);
 	}
 	print_r($results);
+	$rally = 'MAJOR RALLIES';
+	$rallyIndicator = false;
+	$fall = 'MAJOR FALLS';
+	$fallIndicator = false;
 
+	foreach($results as $coin){
+		echo $coin[0]['name'] . "'s current price is " . $coin[0]['price_usd'] . ' its %change in 24hr is ' . $coin[0]['percent_change_24h'] . "\n";
+		if(doubleval($coin[0]['percent_change_1h'])>7.5){
+			$rally = $rally . "\n" . $coin[0]['name'] . " is shooting up. It has gained " . $coin[0]['percent_change_1h'] . " in the past hour";
+			$rallyIndicator = true;
+		}
+		else if(doubleval($coin[0]['percent_change_1h'])<-7.5){
+			$fall = $fall . "\n" . $coin[0]['name'] . " is collapsing. It has dropped " . $coin[0]['percent_change_1h'] . " in the past hour";
+			$fallIndicator = true;
+		}
+	}
+	if($rallyIndicator){
+		echo $rally . "\n";
+	}
+	if($fallIndicator){
+		echo $fall . "\n";
+	}
 	//get response of request
 	/*
 	$data = curl_exec($ch);
@@ -66,5 +87,7 @@
 /*
 option 1: write request for each specified currency
 option 2: request for n currencies, iterate and find match
+
+Add currencies: use file storing names and then use delimeter
 */
 ?>
