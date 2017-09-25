@@ -53,24 +53,24 @@
 	}
 	curl_multi_close($ch);
 	fclose($currencyFile);
-
+	sendMessage($message);
 	//Messaging GroupMe Part
-	$chat = curl_init();
-	curl_setopt($chat, CURLOPT_URL, "https://api.groupme.com/v3/bots/post");
-	curl_setopt($chat, CURLOPT_POST,1);
-	curl_setopt($chat, CURLOPT_POSTFIELDS,http_build_query(array('bot_id'=>'68049da0849ea1551753f26e25','text'=>$message)));
-	curl_setopt($chat, CURLOPT_RETURNTRANSFER, true);
+	function sendMessage($message){
+		$chat = curl_init();
+		curl_setopt($chat, CURLOPT_URL, "https://api.groupme.com/v3/bots/post");
+		curl_setopt($chat, CURLOPT_POST,1);
+		curl_setopt($chat, CURLOPT_POSTFIELDS,http_build_query(array('bot_id'=>'68049da0849ea1551753f26e25','text'=>$message)));
+		curl_setopt($chat, CURLOPT_RETURNTRANSFER, true);
 
-	//$server_reply = curl_exec($chat);
-	
+		if(curl_exec($chat)===false){
+			echo 'Curl error: ' . curl_error($ch);
+		}
+		else{
+			echo 'Good response';
+		}
+		curl_close($chat);
+	}
 
-	if(curl_exec($chat)===false){
-		echo 'Curl error: ' . curl_error($ch);
-	}
-	else{
-		echo 'Good response';
-	}
-	curl_close($chat);
 
 /*
 option 1: write request for each specified currency
