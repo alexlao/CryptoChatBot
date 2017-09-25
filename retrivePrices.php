@@ -1,5 +1,14 @@
 <?php
-	$currencies = array('bitcoin', 'ethereum', 'omisego');
+	//Variables to detect major changes
+	$rally = 'MAJOR RALLIES';
+	$rallyIndicator = false;
+	$fall = 'MAJOR FALLS';
+	$fallIndicator = false;
+	
+	$currencyFile = fopen("currencies.txt","r") or die("Unable to open file");
+	$fileText = fread($currencyFile,filesize("currencies.txt"));
+	$currencies = explode(",",$fileText);
+
 	$currenciesCount = count($currencies);
 	$curl_arr = array();
 	$ch = curl_multi_init();
@@ -21,11 +30,8 @@
 		$results[] = json_decode(curl_multi_getcontent($curl_arr[$i]),true);
 	}
 	print_r($results);
-	$rally = 'MAJOR RALLIES';
-	$rallyIndicator = false;
-	$fall = 'MAJOR FALLS';
-	$fallIndicator = false;
 
+	//Prints current prices for all specified currencies. Also checks for major changes in past hour.
 	foreach($results as $coin){
 		echo $coin[0]['name'] . "'s current price is " . $coin[0]['price_usd'] . ' its %change in 24hr is ' . $coin[0]['percent_change_24h'] . "\n";
 		if(doubleval($coin[0]['percent_change_1h'])>7.5){
@@ -43,6 +49,8 @@
 	if($fallIndicator){
 		echo $fall . "\n";
 	}
+
+	fclose($currencyFile);
 	//get response of request
 	/*
 	$data = curl_exec($ch);
