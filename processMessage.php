@@ -11,7 +11,17 @@
 		$demand = explode(' ', $message);
 		echo $demand[0];
 		if($demand[0][0]==='!'){
-			sendMessage('Command is: ' . $demand[1]);
+			if($demand[0]==='!prices'){
+				getAllPrices();
+			}
+			else if($demand[0] === '!giveme'){
+				sendMessage($demand[1]);
+				getSpecific($demand[1]);
+			}
+			else if($demand[0] === '!add'){
+				addCurrency($demand[1]);
+			}
+			//sendMessage('Command is: ' . $demand[0]);
 			//it is some type of demand
 			//sendMessage($message);
 		}
