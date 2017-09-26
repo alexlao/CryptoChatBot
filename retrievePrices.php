@@ -1,5 +1,6 @@
 <?php
 	//Variables to detect major changes
+	include 'library.php';
 	$rally = "MAJOR RALLIES\n";
 	$rallyIndicator = false;
 	$fall = "MAJOR FALLS\n";
@@ -55,7 +56,7 @@
 	fclose($currencyFile);
 	sendMessage($message);
 	//Messaging GroupMe Part
-	function sendMessage($message){
+	/*function sendMessage($message){
 		$chat = curl_init();
 		curl_setopt($chat, CURLOPT_URL, "https://api.groupme.com/v3/bots/post");
 		curl_setopt($chat, CURLOPT_POST,1);
@@ -69,7 +70,7 @@
 			echo 'Good response';
 		}
 		curl_close($chat);
-	}
+	}*/
 
 
 /*
