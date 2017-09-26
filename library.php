@@ -22,17 +22,21 @@
         	$fall = "MAJOR FALLS\n";
         	$fallIndicator = false;
         	$message = null;
-       		$currencyFile = fopen("currencies.txt","r") or die("Unable to open file");
-        	$fileText = fread($currencyFile,filesize("currencies.txt"));
+       		$currencyFile = fopen("currencies.txt","r");
+        	if($currencyFile === FALSE){
+			sendMessage("No added currencies. Use !add to add currencies.");
+			return;
+		}
+		$fileText = fread($currencyFile,filesize("currencies.txt"));
         	$currencies = explode(",",$fileText);
-
+		var_dump($currencies);
 	        $currenciesCount = count($currencies);
         	$curl_arr = array();
         	$ch = curl_multi_init();
         	$mainURL = "https://api.coinmarketcap.com/v1/ticker/";
         //setting up curl request
 
-        	for($i=0; $i<$currenciesCount;$i++){
+        	for($i=0; $i<$currenciesCount -1;$i++){
                 	$url = $mainURL . $currencies[$i] . '/';
                 	$curl_arr[$i] = curl_init($url);
                 	curl_setopt($curl_arr[$i], CURLOPT_RETURNTRANSFER, true);
@@ -43,7 +47,7 @@
                 	curl_multi_exec($ch,$running);
         	} while($running>0);
 
-        	for($i=0; $i<$currenciesCount;$i++){
+        	for($i=0; $i<$currenciesCount-1;$i++){
                 	$results[] = json_decode(curl_multi_getcontent($curl_arr[$i]),true);
         	}		
         	print_r($results);
@@ -89,16 +93,19 @@
 	}
 
 	function addCurrency($requested){
-		//$currencyFile = fopen("currencies.txt","r") or die("Unable to open file");
-		/*if(file_put_contents("currencies.txt", 'hi', FILE_APPEND)===FALSE){
+		if(file_put_contents("currencies.txt", $requested .',', FILE_APPEND)===FALSE){
 			sendMessage("Error opening file");
 		}
 		else{
 			getAllPrices();
-		}*/
-		$file = fopen("currencies.txt", "a") or die("Unable to open file");
-		fwrite($file, ",".$requested);
-		fclose($file);
+		}
+	/*	$file = fopen("currencies.txt", "a") or die("Unable to open file");
+		fwrite($file, ','.$requested);
+		fclose($file);*/
+	}
+	function clearList(){
+		unlink("currencies.txt");
+		sendMessage("List of currencies cleared.");
 	}
 ?>
 

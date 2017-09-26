@@ -15,11 +15,13 @@
 				getAllPrices();
 			}
 			else if($demand[0] === '!giveme'){
-				sendMessage($demand[1]);
 				getSpecific($demand[1]);
 			}
 			else if($demand[0] === '!add'){
 				addCurrency($demand[1]);
+			}
+			else if($demand[0] === '!clear'){
+				clearList();
 			}
 			//sendMessage('Command is: ' . $demand[0]);
 			//it is some type of demand
