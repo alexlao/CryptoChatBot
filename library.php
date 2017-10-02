@@ -79,12 +79,16 @@
 
 	function getSpecific($requested){
  		$ch =  curl_init();
- 		//setting up curl request
- 		curl_setopt($ch, CURLOPT_URL, "https://api.coinmarketcap.com/v1/ticker/" . $requested . "/");
+		$sym = verifyCurrency($requested);
+		if($sym == NULL){
+			sendMessage($requested." is not a currency. \n");
+			return;
+		}
+		//setting up curl request
+ 		curl_setopt($ch, CURLOPT_URL, "https://api.coinmarketcap.com/v1/ticker/" . $sym . "/");
  		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
  		curl_setopt($ch, CURLOPT_FOLLOWLOCATION,true);
- 
- 		//get response of request
+		//get response of request
 		$data = curl_exec($ch);
 		$result = json_decode($data, true);
 
@@ -106,6 +110,32 @@
 	function clearList(){
 		unlink("currencies.txt");
 		sendMessage("List of currencies cleared.");
+	}
+
+	function verifyCurrency($requested){
+		$servername = "localhost";
+		$username = "alexaqj1_admin";
+		$pw = "";
+		$dbname = "alexaqj1_cryptos";
+
+		$message = "SELECT currencyName FROM currencies WHERE currencyName ='" . $requested . "' OR symbol='" . $requested . "'";
+
+		$connectToDB = new mysqli($servername, $username, $pw, $dbname);
+		if($connectToDB->connect_error){
+			die("Connection to db failed: " . $connectToDB->connect_error);
+		}
+		
+		if(($queryResult=$connectToDB->query($message))===FALSE){
+			echo 'Query Error: ' . $connectToDB->error . "\n";
+			sendMessage($conectToDB->error);
+		}
+		$selectedCurrency = $queryResult->fetch_array(MYSQLI_NUM);
+		if($selectedCurrency != NULL){
+			$selectedCurrency = $selectedCurrency[0];
+		}
+		$queryResult->free();
+		$connectToDB->close();
+		return $selectedCurrency;
 	}
 ?>
 
