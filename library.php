@@ -97,7 +97,12 @@
 	}
 
 	function addCurrency($requested){
-		if(file_put_contents("currencies.txt", $requested .',', FILE_APPEND)===FALSE){
+		$sym = verifyCurrency($requested);
+		if($sym===NULL){
+			sendMessage($requested . " is not a currency. \n");
+			return;
+		}
+		if(file_put_contents("currencies.txt", $sym .',', FILE_APPEND)===FALSE){
 			sendMessage("Error opening file");
 		}
 		else{
@@ -115,7 +120,7 @@
 	function verifyCurrency($requested){
 		$servername = "localhost";
 		$username = "alexaqj1_admin";
-		$pw = "";
+		$pw = "Al3xL4oz!!";
 		$dbname = "alexaqj1_cryptos";
 
 		$message = "SELECT currencyName FROM currencies WHERE currencyName ='" . $requested . "' OR symbol='" . $requested . "'";
