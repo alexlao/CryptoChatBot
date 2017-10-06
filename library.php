@@ -100,21 +100,28 @@
 		$sym = verifyCurrency($requested);
 		if($sym===NULL){
 			sendMessage($requested . " is not a currency. \n");
-			return;
+			return -1; 
 		}
 		if(file_put_contents("currencies.txt", $sym .',', FILE_APPEND)===FALSE){
 			sendMessage("Error opening file");
+			return -1;
 		}
+		return 1;
+		/*
 		else{
 			getAllPrices();
-		}
+		}*/
 	/*	$file = fopen("currencies.txt", "a") or die("Unable to open file");
 		fwrite($file, ','.$requested);
 		fclose($file);*/
 	}
 	function clearList(){
-		unlink("currencies.txt");
-		sendMessage("List of currencies cleared.");
+		if(unlink("currencies.txt")===TRUE){
+			return 1;
+		}
+		else{
+			return -1;
+		}
 	}
 
 	function verifyCurrency($requested){
@@ -141,6 +148,30 @@
 		$queryResult->free();
 		$connectToDB->close();
 		return $selectedCurrency;
+	}
+
+	function removeCurrency($requested){
+		$list = file_get_contents("./currencies.txt");
+		$name = verifyCurrency($requested);
+		if($name ===NULL){
+			sendMessage($requested . " is not a currency. \n");
+			return;
+		}
+		$currencies = explode(",",$list);
+		$newList = NULL;
+		clearList();
+		foreach($currencies as $coinName){
+			if($coinName==NULL){
+				return;
+			}
+			if($coinName == $name){
+
+			}
+			else{
+				addCurrency($coinName);
+			}
+		}
+
 	}
 ?>
 
