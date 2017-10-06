@@ -18,10 +18,15 @@
 				getSpecific($demand[1]);
 			}
 			else if($demand[0] === '!add'){
-				addCurrency($demand[1]);
+				if(addCurrency($demand[1])==1){
+					getAllPrices();
+				}
 			}
 			else if($demand[0] === '!clear'){
 				clearList();
+			}
+			else if($demand[0] === '!remove'){
+				removeCurrency($demand[1]);
 			}
 			//sendMessage('Command is: ' . $demand[0]);
 			//it is some type of demand
