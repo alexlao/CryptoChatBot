@@ -23,7 +23,12 @@
 				}
 			}
 			else if($demand[0] === '!clear'){
-				clearList();
+				if(clearList()==1){
+					sendMessage("List of currencies cleared.");
+				}
+				else{
+					sendMessage("No list of currencies.");
+				}
 			}
 			else if($demand[0] === '!remove'){
 				removeCurrency($demand[1]);
